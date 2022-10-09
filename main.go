@@ -6,19 +6,19 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
+
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
 func homeLink(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintf(w, "Welcome to LIS(Liha image server) 2.0!")
+	_, _ = fmt.Fprintf(w, "Welcome to LFS(Leha file server)!")
 }
 
 func uploadImage(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("file")
-	handler.Filename = uuid.New().String() + strings.TrimPrefix(handler.Filename, ".")
+	handler.Filename = uuid.New().String() 
 	if err != nil {
 		panic(err)
 	}
@@ -31,6 +31,8 @@ func uploadImage(w http.ResponseWriter, r *http.Request) {
 	_, _ = io.WriteString(w, "File url http://localhost:8000/public/"+handler.Filename)
 	_, _ = io.Copy(f, file)
 }
+
+
 
 func main() {
 	log.Println("Server will start at http://localhost:8000/")
