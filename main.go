@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
@@ -18,7 +17,7 @@ func homeLink(w http.ResponseWriter, r *http.Request) {
 
 func uploadImage(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("file")
-	handler.Filename = uuid.New().String() 
+	handler.Filename = uuid.New().String()
 	if err != nil {
 		panic(err)
 	}
@@ -28,14 +27,12 @@ func uploadImage(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer f.Close()
-	_, _ = io.WriteString(w, "File url http://localhost:8000/public/"+handler.Filename)
+	_, _ = io.WriteString(w, "http://192.168.31.180:4554/public/"+handler.Filename)
 	_, _ = io.Copy(f, file)
 }
 
-
-
 func main() {
-	log.Println("Server will start at http://localhost:8000/")
+	log.Println("Server will start at http://192.168.31.180:4554/")
 
 	route := mux.NewRouter()
 

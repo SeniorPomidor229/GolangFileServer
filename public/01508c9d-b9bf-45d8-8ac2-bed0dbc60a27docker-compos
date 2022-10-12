@@ -1,0 +1,61 @@
+services:
+  mongo1:
+    container_name: mongo-node1
+    image: mongo:5
+    networks:
+      - mongo-cluster
+    volumes:
+      - ./mongo-vol:/data/db
+    ports:
+      - 27017:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--journal", "--dbpath", "/data/db" ]
+
+  mongo2:
+    container_name: mongo-node2
+    image: mongo:5
+    networks:
+      - mongo-cluster
+    volumes:
+      - ./mongo-vol:/data/db
+    ports:
+      - 27018:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--journal", "--dbpath", "/data/db" ]
+  
+  mongo3:
+    container_name: mongo-node3
+    image: mongo:5
+    networks:
+      - mongo-cluster
+    volumes:
+      - ./mongo-vol:/data/db
+    ports:
+      - 27019:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--journal", "--dbpath", "/data/db"]
+
+  mongoinit:
+    image: mongo:5
+    restart: "no"
+    networks:
+      - mongo-cluster
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    command: >
+      mongo --host 192.168.31.34:27017 mongosh --eval 
+      '
+        rs.initiate({
+          _id: "dbrs",
+            members: [
+              {_id: 0, host: "192.168.31.34:27017"},
+              {_id: 1, host: "192.168.31.34:27018"},
+              {_id: 2, host: "192.168.31.34:27019"}
+            ]})
+      '      
+
+networks:
+  mongo-cluster:
+    driver: bridge
