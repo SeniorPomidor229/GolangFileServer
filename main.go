@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rs/cors"
 	"github.com/google/uuid"
+	// "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -27,12 +29,12 @@ func uploadImage(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer f.Close()
-	_, _ = io.WriteString(w, "http://192.168.31.180:4554/public/"+handler.Filename)
+	_, _ = io.WriteString(w, "https://lis.4dev.kz/public/"+handler.Filename)
 	_, _ = io.Copy(f, file)
 }
 
 func main() {
-	log.Println("Server will start at http://192.168.31.180:4554/")
+	log.Println("Server will start at https://lis.4dev.kz/")
 
 	route := mux.NewRouter()
 
@@ -42,5 +44,13 @@ func main() {
 	route.HandleFunc("/", homeLink).Methods("GET")
 	route.HandleFunc("/upload", uploadImage).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8000", route))
+
+	c := cors.New(cors.Options{
+        AllowedOrigins: []string{"*"},
+        AllowCredentials: true,
+    })
+
+	handler := c.Handler(route)
+
+	log.Fatal(http.ListenAndServe(":5000", handler))
 }
